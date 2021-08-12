@@ -68,11 +68,11 @@ def main(args):
     label_map = json.loads(args.label_map)
     reverse_label_map = {y: x for x, y in label_map.items()}
     templatizer = utils.TriggerTemplatizer(
-        args.template,
+        args.template, None,
         tokenizer,
         label_map=label_map,
         label_field=args.label_field,
-        add_special_tokens=False
+        add_special_tokens=False, use_ctx=False
     )
 
     # The weights of this projection will help identify the best label words.
@@ -93,7 +93,7 @@ def main(args):
 
     logger.info('Loading datasets')
     collator = utils.Collator(pad_token_id=tokenizer.pad_token_id)
-    train_dataset = utils.load_trigger_dataset(args.train, templatizer)
+    train_dataset = utils.load_trigger_dataset(args.train, templatizer, use_ctx=False)
     train_loader = DataLoader(train_dataset, batch_size=args.bsz, shuffle=True, collate_fn=collator)
 
     optimizer = torch.optim.Adam(projection.parameters(), lr=args.lr)
